@@ -4,7 +4,7 @@ Aplicativo móvel de quiz desenvolvido em **React Native com Expo** para o traba
 
 O jogador informa seu nome, escolhe uma categoria e uma dificuldade, responde a 10 perguntas de múltipla escolha obtidas da API pública [Open Trivia DB](https://opentdb.com), recebe o retorno de cada resposta na hora e tem a pontuação registrada em um **ranking local**, guardado no próprio aparelho. As perguntas, que a API fornece em inglês, são traduzidas automaticamente para o português pela API [MyMemory](https://mymemory.translated.net).
 
-**Repositório:** https://github.com/SEU-USUARIO/responde-ai <!-- troque pelo link real do repositório -->
+**Repositório:** https://github.com/joaomgsb/responde-ai
 
 ## Integrantes
 
