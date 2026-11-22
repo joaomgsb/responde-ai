@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { cores, espaco, fonte, raio } from '../theme';
+import { useTema } from '../context/TemaContext';
+import { espaco, fonte, raio } from '../theme';
 import { formatarData, rotuloDificuldade } from '../utils/jogo';
 
-// Cores das três primeiras posições (ouro, prata e bronze).
+// Cores das três primeiras posições (ouro, prata e bronze), iguais nos dois temas.
 const MEDALHAS = {
   1: { fundo: '#FEF3C7', texto: '#B45309' },
   2: { fundo: '#E5E7EB', texto: '#374151' },
@@ -11,7 +12,10 @@ const MEDALHAS = {
 };
 
 function RankingItem({ posicao, registro, destaque }) {
+  const { cores } = useTema();
+  const styles = useMemo(() => criarEstilos(cores), [cores]);
   const medalha = MEDALHAS[posicao];
+
   return (
     <View style={[styles.item, destaque && styles.destaque]}>
       <View style={[styles.posicao, medalha && { backgroundColor: medalha.fundo }]}>
@@ -37,32 +41,33 @@ function RankingItem({ posicao, registro, destaque }) {
 
 export default React.memo(RankingItem);
 
-const styles = StyleSheet.create({
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: espaco.md,
-    backgroundColor: cores.branco,
-    borderWidth: 1,
-    borderColor: cores.borda,
-    borderRadius: raio.lg,
-    paddingVertical: 10,
-    paddingHorizontal: espaco.md,
-  },
-  destaque: { borderWidth: 2, borderColor: cores.primaria },
-  posicao: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: cores.primariaSuave,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  posicaoTexto: { color: cores.primaria, fontWeight: '800', fontSize: 13 },
-  textos: { flex: 1 },
-  nome: { fontWeight: '700', fontSize: fonte.normal, color: cores.texto },
-  detalhe: { fontSize: fonte.pequena, color: cores.textoSecundario, marginTop: 2 },
-  pontuacao: { alignItems: 'flex-end' },
-  pontos: { fontWeight: '800', color: cores.primaria, fontSize: fonte.media },
-  acertos: { fontSize: 11, color: cores.textoSecundario },
-});
+const criarEstilos = (cores) =>
+  StyleSheet.create({
+    item: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: espaco.md,
+      backgroundColor: cores.superficie,
+      borderWidth: 1,
+      borderColor: cores.borda,
+      borderRadius: raio.lg,
+      paddingVertical: 10,
+      paddingHorizontal: espaco.md,
+    },
+    destaque: { borderWidth: 2, borderColor: cores.destaque },
+    posicao: {
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+      backgroundColor: cores.primariaSuave,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    posicaoTexto: { color: cores.destaque, fontWeight: '800', fontSize: 13 },
+    textos: { flex: 1 },
+    nome: { fontWeight: '700', fontSize: fonte.normal, color: cores.texto },
+    detalhe: { fontSize: fonte.pequena, color: cores.textoSecundario, marginTop: 2 },
+    pontuacao: { alignItems: 'flex-end' },
+    pontos: { fontWeight: '800', color: cores.destaque, fontSize: fonte.media },
+    acertos: { fontSize: 11, color: cores.textoSecundario },
+  });

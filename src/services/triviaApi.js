@@ -60,7 +60,7 @@ async function obterToken() {
   try {
     const dados = await buscarJson('/api_token.php?command=request');
     if (dados.response_code === 0 && dados.token) tokenSessao = dados.token;
-  } catch (erro) {
+  } catch {
     // Sem token o jogo continua funcionando, só pode repetir perguntas.
     tokenSessao = null;
   }
@@ -71,7 +71,7 @@ async function reiniciarToken() {
   if (!tokenSessao) return;
   try {
     await buscarJson(`/api_token.php?command=reset&token=${tokenSessao}`);
-  } catch (erro) {
+  } catch {
     tokenSessao = null;
   }
 }

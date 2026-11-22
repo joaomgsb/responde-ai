@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { cores, espaco, fonte, raio } from '../theme';
+import { useTema } from '../context/TemaContext';
+import { espaco, fonte, raio } from '../theme';
 
 // Alternativa de resposta. O estado visual depois da resposta é:
 // 'correta' (verde), 'errada' (vermelho), 'apagada' (as demais) ou
 // 'normal' (antes de responder).
 export default function OptionButton({ letra, texto, estado = 'normal', desabilitado, onPress }) {
+  const { cores } = useTema();
+  const styles = useMemo(() => criarEstilos(cores), [cores]);
+  const marcada = estado === 'correta' || estado === 'errada';
+
   return (
     <Pressable
       accessibilityRole="button"
@@ -28,45 +33,42 @@ export default function OptionButton({ letra, texto, estado = 'normal', desabili
           estado === 'errada' && styles.letraErrada,
         ]}
       >
-        <Text
-          style={[styles.letraTexto, (estado === 'correta' || estado === 'errada') && styles.letraTextoBranco]}
-        >
-          {letra}
-        </Text>
+        <Text style={[styles.letraTexto, marcada && styles.letraTextoMarcada]}>{letra}</Text>
       </View>
       <Text style={styles.texto}>{texto}</Text>
     </Pressable>
   );
 }
 
-const styles = StyleSheet.create({
-  opcao: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: espaco.md,
-    backgroundColor: cores.branco,
-    borderWidth: 1.5,
-    borderColor: cores.borda,
-    borderRadius: raio.lg,
-    paddingVertical: 13,
-    paddingHorizontal: espaco.md,
-    minHeight: 52,
-  },
-  correta: { borderColor: cores.sucesso, backgroundColor: cores.sucessoSuave },
-  errada: { borderColor: cores.erro, backgroundColor: cores.erroSuave },
-  apagada: { opacity: 0.5 },
-  pressionado: { opacity: 0.8 },
-  letra: {
-    width: 28,
-    height: 28,
-    borderRadius: raio.sm,
-    backgroundColor: cores.primariaSuave,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  letraCorreta: { backgroundColor: cores.sucesso },
-  letraErrada: { backgroundColor: cores.erro },
-  letraTexto: { color: cores.primaria, fontWeight: '800', fontSize: 13 },
-  letraTextoBranco: { color: cores.branco },
-  texto: { flex: 1, fontSize: fonte.normal + 0.5, color: cores.texto, fontWeight: '500' },
-});
+const criarEstilos = (cores) =>
+  StyleSheet.create({
+    opcao: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: espaco.md,
+      backgroundColor: cores.superficie,
+      borderWidth: 1.5,
+      borderColor: cores.borda,
+      borderRadius: raio.lg,
+      paddingVertical: 13,
+      paddingHorizontal: espaco.md,
+      minHeight: 52,
+    },
+    correta: { borderColor: cores.sucesso, backgroundColor: cores.sucessoSuave },
+    errada: { borderColor: cores.erro, backgroundColor: cores.erroSuave },
+    apagada: { opacity: 0.5 },
+    pressionado: { opacity: 0.8 },
+    letra: {
+      width: 28,
+      height: 28,
+      borderRadius: raio.sm,
+      backgroundColor: cores.primariaSuave,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    letraCorreta: { backgroundColor: cores.sucesso },
+    letraErrada: { backgroundColor: cores.erro },
+    letraTexto: { color: cores.destaque, fontWeight: '800', fontSize: 13 },
+    letraTextoMarcada: { color: cores.superficie },
+    texto: { flex: 1, fontSize: fonte.normal + 0.5, color: cores.texto, fontWeight: '500' },
+  });

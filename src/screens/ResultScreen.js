@@ -1,14 +1,18 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import LinkButton from '../components/LinkButton';
 import PrimaryButton from '../components/PrimaryButton';
 import { useQuiz } from '../context/QuizContext';
-import { cores, espaco, fonte, raio } from '../theme';
+import { useTema } from '../context/TemaContext';
+import { espaco, fonte, raio } from '../theme';
 import { pontosDaPergunta, rotuloDificuldade } from '../utils/jogo';
 
 // Tela Resultado: pontos, acertos e posição no ranking (RF07 e RF08).
 export default function ResultScreen({ navigation }) {
   const { ultimoResultado: resultado, ranking } = useQuiz();
+  const { cores } = useTema();
+  const styles = useMemo(() => criarEstilos(cores), [cores]);
   const insets = useSafeAreaInsets();
 
   if (!resultado) {
@@ -42,10 +46,11 @@ export default function ResultScreen({ navigation }) {
         </Text>
 
         <View style={styles.cartao}>
-          <Linha rotulo="Acertos" valor={`${resultado.acertos} de ${resultado.total}`} />
-          <Linha rotulo="Categoria" valor={resultado.categoriaNome} />
-          <Linha rotulo="Dificuldade" valor={rotuloDificuldade(resultado.dificuldade)} />
+          <Linha styles={styles} rotulo="Acertos" valor={`${resultado.acertos} de ${resultado.total}`} />
+          <Linha styles={styles} rotulo="Categoria" valor={resultado.categoriaNome} />
+          <Linha styles={styles} rotulo="Dificuldade" valor={rotuloDificuldade(resultado.dificuldade)} />
           <Linha
+            styles={styles}
             rotulo="Pontos por acerto"
             valor={resultado.dificuldade === 'any' ? '10 a 30' : String(pontosDaPergunta(resultado.dificuldade))}
             ultima
@@ -57,15 +62,13 @@ export default function ResultScreen({ navigation }) {
         {/* "Jogar novamente" volta para Categorias com a mesma configuração. */}
         <PrimaryButton titulo="Jogar novamente" onPress={() => navigation.navigate('Categories')} />
         <PrimaryButton titulo="Ver ranking" variante="contorno" onPress={() => navigation.navigate('Ranking')} />
-        <Text style={styles.link} onPress={() => navigation.popToTop()} accessibilityRole="link">
-          Voltar ao início
-        </Text>
+        <LinkButton titulo="Voltar ao início" onPress={() => navigation.popToTop()} />
       </View>
     </View>
   );
 }
 
-function Linha({ rotulo, valor, ultima }) {
+function Linha({ styles, rotulo, valor, ultima }) {
   return (
     <View style={[styles.linha, ultima && styles.linhaUltima]}>
       <Text style={styles.linhaRotulo}>{rotulo}</Text>
@@ -74,51 +77,45 @@ function Linha({ rotulo, valor, ultima }) {
   );
 }
 
-const styles = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cores.fundo },
-  vazio: { justifyContent: 'center', padding: espaco.xl, gap: espaco.md },
-  mensagem: { textAlign: 'center', color: cores.textoSecundario, fontSize: fonte.media },
-  conteudo: { padding: espaco.lg, gap: espaco.md, alignItems: 'stretch' },
-  anel: {
-    alignSelf: 'center',
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    borderWidth: 16,
-    borderColor: cores.primaria,
-    backgroundColor: cores.branco,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: espaco.sm,
-  },
-  pontos: { fontSize: 34, fontWeight: '800', color: cores.texto },
-  pontosLegenda: { fontSize: fonte.pequena, color: cores.textoSecundario },
-  saudacao: { textAlign: 'center', fontWeight: '700', fontSize: 17, color: cores.texto },
-  posicao: { textAlign: 'center', fontSize: 13, color: cores.textoSecundario, marginTop: -6 },
-  cartao: {
-    backgroundColor: cores.branco,
-    borderWidth: 1,
-    borderColor: cores.borda,
-    borderRadius: raio.lg,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-  },
-  linha: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 9,
-    borderBottomWidth: 1,
-    borderBottomColor: cores.borda,
-  },
-  linhaUltima: { borderBottomWidth: 0 },
-  linhaRotulo: { color: cores.textoSecundario, fontSize: fonte.normal },
-  linhaValor: { color: cores.texto, fontWeight: '700', fontSize: fonte.normal },
-  rodape: { paddingHorizontal: espaco.lg, paddingTop: espaco.sm, gap: espaco.md },
-  link: {
-    textAlign: 'center',
-    color: cores.primaria,
-    fontWeight: '600',
-    fontSize: fonte.normal,
-    paddingVertical: espaco.sm,
-  },
-});
+const criarEstilos = (cores) =>
+  StyleSheet.create({
+    tela: { flex: 1, backgroundColor: cores.fundo },
+    vazio: { justifyContent: 'center', padding: espaco.xl, gap: espaco.md },
+    mensagem: { textAlign: 'center', color: cores.textoSecundario, fontSize: fonte.media },
+    conteudo: { padding: espaco.lg, gap: espaco.md, alignItems: 'stretch' },
+    anel: {
+      alignSelf: 'center',
+      width: 150,
+      height: 150,
+      borderRadius: 75,
+      borderWidth: 16,
+      borderColor: cores.primaria,
+      backgroundColor: cores.superficie,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: espaco.sm,
+    },
+    pontos: { fontSize: 34, fontWeight: '800', color: cores.texto },
+    pontosLegenda: { fontSize: fonte.pequena, color: cores.textoSecundario },
+    saudacao: { textAlign: 'center', fontWeight: '700', fontSize: 17, color: cores.texto },
+    posicao: { textAlign: 'center', fontSize: 13, color: cores.textoSecundario, marginTop: -6 },
+    cartao: {
+      backgroundColor: cores.superficie,
+      borderWidth: 1,
+      borderColor: cores.borda,
+      borderRadius: raio.lg,
+      paddingHorizontal: 14,
+      paddingVertical: 6,
+    },
+    linha: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingVertical: 9,
+      borderBottomWidth: 1,
+      borderBottomColor: cores.borda,
+    },
+    linhaUltima: { borderBottomWidth: 0 },
+    linhaRotulo: { color: cores.textoSecundario, fontSize: fonte.normal },
+    linhaValor: { color: cores.texto, fontWeight: '700', fontSize: fonte.normal },
+    rodape: { paddingHorizontal: espaco.lg, paddingTop: espaco.sm, gap: espaco.md },
+  });

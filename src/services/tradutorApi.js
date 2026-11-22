@@ -55,7 +55,7 @@ async function traduzirTexto(texto) {
     const limpo = limparEntidades(traduzido).trim();
     cache.set(texto, limpo);
     return limpo;
-  } catch (erro) {
+  } catch {
     return null;
   } finally {
     clearTimeout(temporizador);

@@ -5,17 +5,20 @@ import CategoriesScreen from '../screens/CategoriesScreen';
 import QuizScreen from '../screens/QuizScreen';
 import ResultScreen from '../screens/ResultScreen';
 import RankingScreen from '../screens/RankingScreen';
-import { cores } from '../theme';
+import { useTema } from '../context/TemaContext';
 
 // Pilha de navegação com as cinco telas do app.
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
+  const { cores } = useTema();
+
   return (
     <Stack.Navigator
       initialRouteName="Home"
       screenOptions={{
-        headerTintColor: cores.primaria,
+        headerTintColor: cores.destaque,
+        headerStyle: { backgroundColor: cores.superficie },
         headerTitleStyle: { color: cores.texto, fontWeight: '700' },
         headerBackTitle: 'Voltar',
         headerShadowVisible: true,

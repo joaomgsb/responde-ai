@@ -5,6 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CHAVE_JOGADOR = '@quiz:jogador';
 const CHAVE_RANKING = '@quiz:ranking';
+const CHAVE_TEMA = '@quiz:tema';
+const TEMAS_VALIDOS = ['automatico', 'claro', 'escuro'];
 
 // RNF05: o ranking guarda no máximo as 50 melhores partidas.
 export const LIMITE_RANKING = 50;
@@ -44,5 +46,24 @@ export async function salvarRanking(ranking) {
     await AsyncStorage.setItem(CHAVE_RANKING, JSON.stringify(ranking));
   } catch (erro) {
     console.warn('Não foi possível salvar o ranking', erro);
+  }
+}
+
+// Preferência de tema: 'automatico', 'claro' ou 'escuro'.
+export async function carregarTema() {
+  try {
+    const tema = await AsyncStorage.getItem(CHAVE_TEMA);
+    return TEMAS_VALIDOS.includes(tema) ? tema : null;
+  } catch (erro) {
+    console.warn('Não foi possível ler o tema', erro);
+    return null;
+  }
+}
+
+export async function salvarTema(tema) {
+  try {
+    await AsyncStorage.setItem(CHAVE_TEMA, tema);
+  } catch (erro) {
+    console.warn('Não foi possível salvar o tema', erro);
   }
 }

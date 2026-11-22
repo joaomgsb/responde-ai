@@ -1,10 +1,12 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import LinkButton from '../components/LinkButton';
 import OptionButton from '../components/OptionButton';
 import PrimaryButton from '../components/PrimaryButton';
 import { useQuiz } from '../context/QuizContext';
-import { cores, espaco, fonte, raio } from '../theme';
+import { useTema } from '../context/TemaContext';
+import { espaco, fonte, raio } from '../theme';
 import { confirmar } from '../utils/confirmar';
 import { pontosDaPergunta, rotuloDificuldade } from '../utils/jogo';
 
@@ -14,6 +16,8 @@ const LETRAS = ['A', 'B', 'C', 'D'];
 // pontuação (RF07) e saída com confirmação (RF13).
 export default function QuizScreen({ navigation }) {
   const { partida, config, responder, proximaPergunta, finalizarPartida, abandonarPartida } = useQuiz();
+  const { cores } = useTema();
+  const styles = useMemo(() => criarEstilos(cores), [cores]);
   const insets = useSafeAreaInsets();
   // Quando true, a tela pode ser removida sem pedir confirmação.
   const liberarSaida = useRef(false);
@@ -37,7 +41,7 @@ export default function QuizScreen({ navigation }) {
       ),
       headerRight: () => <Text style={styles.pontosCabecalho}>{partida ? partida.pontos : 0} pts</Text>,
     });
-  }, [navigation, config.categoria, partida]);
+  }, [navigation, config.categoria, partida, styles]);
 
   // Qualquer tentativa de sair (botão ✕, botão voltar do Android, gesto)
   // passa por aqui e pede confirmação antes de descartar a partida.
@@ -105,13 +109,12 @@ export default function QuizScreen({ navigation }) {
 
         <Text style={styles.enunciado}>{textoEnunciado}</Text>
         {pergunta.traducao ? (
-          <Text
-            style={styles.alternarIdioma}
+          <LinkButton
+            titulo={verOriginal ? 'Ver em português' : 'Ver original em inglês'}
             onPress={() => setVerOriginal((v) => !v)}
-            accessibilityRole="button"
-          >
-            {verOriginal ? 'Ver em português' : 'Ver original em inglês'}
-          </Text>
+            alinhamento="flex-start"
+            style={styles.alternarIdioma}
+          />
         ) : null}
 
         <View style={styles.alternativas}>
@@ -148,31 +151,32 @@ export default function QuizScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cores.fundo },
-  conteudo: { padding: espaco.lg, gap: espaco.md },
-  fechar: { paddingHorizontal: espaco.sm, minWidth: 44, minHeight: 44, justifyContent: 'center' },
-  fecharTexto: { fontSize: 20, color: cores.primaria, fontWeight: '700' },
-  pontosCabecalho: { fontWeight: '800', color: cores.primaria, fontSize: fonte.media, paddingHorizontal: espaco.sm },
-  linhaTopo: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  progressoTexto: { fontSize: 13, color: cores.textoSecundario, fontWeight: '600' },
-  etiqueta: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: cores.ouro,
-    backgroundColor: cores.ouroSuave,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    overflow: 'hidden',
-  },
-  barra: { height: 8, backgroundColor: cores.borda, borderRadius: raio.pilula, overflow: 'hidden' },
-  barraPreenchida: { height: '100%', backgroundColor: cores.primaria },
-  enunciado: { fontSize: fonte.grande, fontWeight: '700', lineHeight: 25, color: cores.texto, marginTop: 6 },
-  alternarIdioma: { color: cores.primaria, fontWeight: '600', fontSize: 13, marginTop: -4, alignSelf: 'flex-start' },
-  alternativas: { gap: espaco.md - 2 },
-  feedback: { borderRadius: raio.md, padding: espaco.md, fontSize: 13, fontWeight: '600', overflow: 'hidden' },
-  feedbackCerto: { backgroundColor: cores.sucessoSuave, color: '#065F46' },
-  feedbackErrado: { backgroundColor: cores.erroSuave, color: cores.erroTexto },
-  rodape: { paddingHorizontal: espaco.lg, paddingTop: espaco.md, backgroundColor: cores.fundo },
-});
+const criarEstilos = (cores) =>
+  StyleSheet.create({
+    tela: { flex: 1, backgroundColor: cores.fundo },
+    conteudo: { padding: espaco.lg, gap: espaco.md },
+    fechar: { paddingHorizontal: espaco.sm, minWidth: 44, minHeight: 44, justifyContent: 'center' },
+    fecharTexto: { fontSize: 20, color: cores.destaque, fontWeight: '700' },
+    pontosCabecalho: { fontWeight: '800', color: cores.destaque, fontSize: fonte.media, paddingHorizontal: espaco.sm },
+    linhaTopo: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    progressoTexto: { fontSize: 13, color: cores.textoSecundario, fontWeight: '600' },
+    etiqueta: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: cores.ouro,
+      backgroundColor: cores.ouroSuave,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 6,
+      overflow: 'hidden',
+    },
+    barra: { height: 8, backgroundColor: cores.borda, borderRadius: raio.pilula, overflow: 'hidden' },
+    barraPreenchida: { height: '100%', backgroundColor: cores.primariaClara },
+    enunciado: { fontSize: fonte.grande, fontWeight: '700', lineHeight: 25, color: cores.texto, marginTop: 6 },
+    alternarIdioma: { marginTop: -10, marginBottom: -6 },
+    alternativas: { gap: espaco.md - 2 },
+    feedback: { borderRadius: raio.md, padding: espaco.md, fontSize: 13, fontWeight: '600', overflow: 'hidden' },
+    feedbackCerto: { backgroundColor: cores.sucessoSuave, color: cores.sucessoTexto },
+    feedbackErrado: { backgroundColor: cores.erroSuave, color: cores.erroTexto },
+    rodape: { paddingHorizontal: espaco.lg, paddingTop: espaco.md, backgroundColor: cores.fundo },
+  });

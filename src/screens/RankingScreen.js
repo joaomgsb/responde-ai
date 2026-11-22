@@ -1,10 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Chip from '../components/Chip';
 import PrimaryButton from '../components/PrimaryButton';
 import RankingItem from '../components/RankingItem';
 import { useQuiz } from '../context/QuizContext';
-import { cores, espaco, fonte, raio } from '../theme';
+import { useTema } from '../context/TemaContext';
+import { espaco, fonte } from '../theme';
 import { confirmar } from '../utils/confirmar';
 
 const TODAS = 'todas';
@@ -13,6 +15,8 @@ const TODAS = 'todas';
 // categoria e opção de limpar com confirmação (RF11).
 export default function RankingScreen() {
   const { ranking, ultimoResultado, limparRanking } = useQuiz();
+  const { cores } = useTema();
+  const styles = useMemo(() => criarEstilos(cores), [cores]);
   const insets = useSafeAreaInsets();
   const [filtro, setFiltro] = useState(TODAS);
 
@@ -81,39 +85,14 @@ export default function RankingScreen() {
   );
 }
 
-function Chip({ rotulo, ativo, onPress }) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="radio"
-      accessibilityState={{ selected: ativo }}
-      style={[styles.chip, ativo && styles.chipAtivo]}
-    >
-      <Text style={[styles.chipTexto, ativo && styles.chipTextoAtivo]}>{rotulo}</Text>
-    </Pressable>
-  );
-}
-
-const styles = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cores.fundo },
-  filtros: { paddingHorizontal: espaco.lg, paddingTop: espaco.lg, paddingBottom: espaco.sm, gap: espaco.sm },
-  chip: {
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    minHeight: 36,
-    justifyContent: 'center',
-    borderRadius: raio.pilula,
-    borderWidth: 1,
-    borderColor: cores.borda,
-    backgroundColor: cores.branco,
-  },
-  chipAtivo: { backgroundColor: cores.primaria, borderColor: cores.primaria },
-  chipTexto: { fontSize: 13, fontWeight: '600', color: cores.texto },
-  chipTextoAtivo: { color: cores.branco },
-  lista: { flex: 1 },
-  listaConteudo: { paddingHorizontal: espaco.lg, paddingVertical: espaco.sm, flexGrow: 1 },
-  vazio: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: espaco.xs, paddingVertical: 60 },
-  vazioTitulo: { fontWeight: '700', fontSize: fonte.media, color: cores.texto },
-  vazioTexto: { color: cores.textoSecundario, fontSize: fonte.normal, textAlign: 'center' },
-  rodape: { paddingHorizontal: espaco.lg, paddingTop: espaco.sm },
-});
+const criarEstilos = (cores) =>
+  StyleSheet.create({
+    tela: { flex: 1, backgroundColor: cores.fundo },
+    filtros: { paddingHorizontal: espaco.lg, paddingTop: espaco.lg, paddingBottom: espaco.sm, gap: espaco.sm },
+    lista: { flex: 1 },
+    listaConteudo: { paddingHorizontal: espaco.lg, paddingVertical: espaco.sm, flexGrow: 1 },
+    vazio: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: espaco.xs, paddingVertical: 60 },
+    vazioTitulo: { fontWeight: '700', fontSize: fonte.media, color: cores.texto },
+    vazioTexto: { color: cores.textoSecundario, fontSize: fonte.normal, textAlign: 'center' },
+    rodape: { paddingHorizontal: espaco.lg, paddingTop: espaco.sm },
+  });

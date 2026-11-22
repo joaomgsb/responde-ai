@@ -25,7 +25,7 @@ export function pontosDaPergunta(dificuldade) {
 export function decodificar(texto) {
   try {
     return decodeURIComponent(texto);
-  } catch (erro) {
+  } catch {
     return texto;
   }
 }

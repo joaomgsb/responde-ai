@@ -46,7 +46,9 @@ Outras formas de abrir:
 - **Emulador Android:** aperte `a` no terminal (é preciso ter o Android Studio instalado).
 - **Se o QR Code não conectar** (rede da faculdade, por exemplo): rode `npx expo start --tunnel`.
 
-O app precisa de internet para buscar categorias e perguntas. O ranking e o nome do jogador ficam salvos no aparelho e continuam lá depois de fechar o app.
+O app precisa de internet para buscar categorias e perguntas. O ranking, o nome do jogador e o tema escolhido ficam salvos no aparelho e continuam lá depois de fechar o app.
+
+Para verificar o código com o ESLint configurado pelo Expo: `npm run lint`.
 
 ## Requisitos da disciplina
 
@@ -59,11 +61,16 @@ O app precisa de internet para buscar categorias e perguntas. O ranking e o nome
 | Context API | `src/context/QuizContext.js` (Context API + `useReducer`), acessado pelo hook `useQuiz()` |
 | Persistência | `src/services/storage.js` com AsyncStorage (nome do jogador e ranking) |
 
-Opcional: ícone próprio do aplicativo (`assets/icon.png`).
+Itens opcionais implementados:
+
+- **Splash própria:** tela de abertura animada (`src/components/SplashView.js`) exibida enquanto o app lê os dados salvos, e splash nativa configurada no `app.json` (plugin `expo-splash-screen`).
+- **Tema claro ou escuro:** na tela Início, o jogador escolhe *Automático* (segue o aparelho), *Claro* ou *Escuro*; a escolha fica salva (`src/context/TemaContext.js`).
+- Ícone próprio do aplicativo (`assets/icon.png`).
 
 ## Funcionalidades
 
-- **Início:** nome do jogador (salvo no aparelho) e resumo do desempenho: partidas, melhor pontuação e percentual de acertos.
+- **Abertura:** tela de abertura animada com o logotipo do app.
+- **Início:** nome do jogador (salvo no aparelho), resumo do desempenho (partidas, melhor pontuação e percentual de acertos) e escolha do tema: automático, claro ou escuro.
 - **Categorias:** escolha da dificuldade (qualquer, fácil, média ou difícil) e da categoria. São 24 categorias da API, com nomes traduzidos para o português. Uma chave liga ou desliga a tradução automática das perguntas.
 - **Pergunta:** uma pergunta por vez, com alternativas embaralhadas, barra de progresso e pontuação no cabeçalho. Depois de responder, a alternativa certa fica verde, a errada fica vermelha e aparece uma mensagem. O link **Ver original em inglês** mostra o texto da API sem tradução. O botão ✕ sai da partida, sempre com confirmação.
 - **Resultado:** pontos, acertos e posição no ranking.
@@ -84,17 +91,19 @@ A Open Trivia DB só tem perguntas em inglês. Antes de a partida começar, o ap
 ## Estrutura do projeto
 
 ```
-App.js                      Ponto de entrada: QuizProvider + NavigationContainer
+App.js                      Ponto de entrada: provedores (tema e quiz), splash e NavigationContainer
 src/
   navigation/AppNavigator.js   Pilha de telas (React Navigation, Native Stack)
   screens/                     HomeScreen, CategoriesScreen, QuizScreen, ResultScreen, RankingScreen
-  components/                  PrimaryButton, CategoryItem, OptionButton, RankingItem, LoadingView, ErrorView
+  components/                  PrimaryButton, LinkButton, Chip, CategoryItem, OptionButton, RankingItem,
+                               LoadingView, ErrorView e SplashView (abertura animada)
   context/QuizContext.js       Estado compartilhado: jogador, configuração, partida e ranking
+  context/TemaContext.js       Tema claro ou escuro e a preferência do jogador
   services/triviaApi.js        Chamadas à Open Trivia DB (categorias, token de sessão, perguntas)
   services/tradutorApi.js      Tradução das perguntas para o português (MyMemory)
   services/storage.js          Leitura e gravação no AsyncStorage
   utils/                       Regras do jogo, tradução das categorias e confirmação
-  theme/index.js               Cores, espaçamentos e tamanhos de fonte
+  theme/index.js               Paletas dos temas claro e escuro, espaçamentos e tamanhos de fonte
 ```
 
 ## API utilizada
@@ -121,13 +130,16 @@ Todas instaladas com `npm install`, sem configuração extra, e compatíveis com
 | `@react-navigation/native` e `@react-navigation/native-stack` | Navegação em pilha entre as telas |
 | `react-native-screens` e `react-native-safe-area-context` | Dependências da navegação (telas nativas e áreas seguras da tela) |
 | `@react-native-async-storage/async-storage` | Persistência local do nome do jogador e do ranking |
+| `expo-splash-screen` | Splash nativa: mantém a abertura até a primeira tela ser desenhada (já incluída no Expo Go) |
 | `react-dom`, `react-native-web` e `@expo/metro-runtime` | Apenas para abrir o app no navegador (`npm run web`) |
+| `eslint` e `eslint-config-expo` (desenvolvimento) | Verificação do código com `npm run lint` |
 
 ## Persistência
 
-Os dados ficam no **AsyncStorage**, no próprio aparelho, em duas chaves:
+Os dados ficam no **AsyncStorage**, no próprio aparelho, em três chaves:
 
 - `@quiz:jogador`: nome do jogador (texto);
-- `@quiz:ranking`: lista em JSON das partidas (nome, pontos, acertos, total, categoria, dificuldade e data).
+- `@quiz:ranking`: lista em JSON das partidas (nome, pontos, acertos, total, categoria, dificuldade e data);
+- `@quiz:tema`: tema escolhido (`automatico`, `claro` ou `escuro`).
 
 O armazenamento local foi escolhido porque o ranking compara pessoas que usam o mesmo aparelho, os dados são pequenos e não há contas de usuário. Assim o app também mostra o ranking sem internet.
